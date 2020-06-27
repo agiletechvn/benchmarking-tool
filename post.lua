@@ -6,6 +6,7 @@ local puremagic = require('puremagic')
 
 
 local parser = argparse("script", "Benchmarking tool.")
+parser:option("-m --method", "HTTP method.")
 parser:option("-f --file", "Image file."):count("*")
 parser:option("-d --data", "Form data."):count("*")
 
@@ -63,14 +64,20 @@ function init(args)
     local data = parser:parse(args)        
     filenames = data['file']      
     fieldnames = data['data']      
-    -- has form data to post
-    if (table.getn(filenames) > 0) or (table.getn(fieldnames) > 0) then
-        print('posting')
-        wrk.method = "POST"    
-        wrk.headers["Content-Type"] = "multipart/form-data; boundary=" .. Boundary
+
+    -- auto assign method for HTTP based on formdata
+    if not(data['method'] == nil) then 
+        wrk.method = data['method']        
     else 
-        wrk.method = "GET"
-    end 
+        -- has form data to post
+        if (table.getn(filenames) > 0) or (table.getn(fieldnames) > 0) then
+            print('posting')
+            wrk.method = "POST"    
+            wrk.headers["Content-Type"] = "multipart/form-data; boundary=" .. Boundary
+        else 
+            wrk.method = "GET"
+        end 
+    end
 
 end 
 

@@ -16,7 +16,8 @@ wrk -c 4 -d 1m -t 4 -s post.lua 'https://donut-dot-hottab-net.appspot.com/v3/res
   -H 'authority: donut-dot-hottab-net.appspot.com' \
   -H 'origin: https://sopa.asia' \
   -H 'referer: https://sopa.asia/' \
-  --latency --timeout 30s
+  --latency --timeout 30s -- \
+  -m GET
 
 ```
 
