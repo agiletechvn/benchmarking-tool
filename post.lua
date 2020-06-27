@@ -1,11 +1,11 @@
--- HTTP POST script which simulates a file upload
+-- HTTP benchmarking script which simulates a file upload
 -- HTTP method, body, and adding a header
 
 local argparse = require "argparse"
 local puremagic = require('puremagic')
 
 
-local parser = argparse("script", "Post benchmarking.")
+local parser = argparse("script", "Benchmarking tool.")
 parser:option("-f --file", "Image file."):count("*")
 parser:option("-d --data", "Form data."):count("*")
 
@@ -62,43 +62,55 @@ end
 function init(args)     
     local data = parser:parse(args)        
     filenames = data['file']      
-    fieldnames = data['data']       
-
-    wrk.method = "POST"    
-    wrk.headers["Content-Type"] = "multipart/form-data; boundary=" .. Boundary
+    fieldnames = data['data']      
+    -- has form data to post
+    if (table.getn(filenames) > 0) or (table.getn(fieldnames) > 0) then
+        print('posting')
+        wrk.method = "POST"    
+        wrk.headers["Content-Type"] = "multipart/form-data; boundary=" .. Boundary
+    else 
+        wrk.method = "GET"
+    end 
 
 end 
 
-function request()    
+-- function request()    
 
-    -- round robin data
-    local filename = filenames[(counter - 1) % (table.getn(filenames)) + 1]
-    local fieldname = fieldnames[(counter - 1) % (table.getn(fieldnames)) + 1]
+--     if wrk.method == "POST" then
+--         -- assign body 
+--         wrk.body = ""
 
-    -- update counter
-    counter = counter + 1
-
-    -- assign body 
-    wrk.body = ""
-    -- print(index,filename)    
-
-    -- form files    
-    for k, v in string.gmatch(filename, "([%w_]+)=([^&]*)") do        
-        wrk.body = wrk.body .. get_form_data(k, v, true)
-    end
-    
-    -- form fields
-    for k, v in string.gmatch(fieldname, "([%w_]+)=([^&]*)") do        
-        wrk.body = wrk.body .. get_form_data(k, v, false) 
-    end
-    
-    -- last boundary
-    wrk.body = wrk.body .. LastBoundary
+--         -- round robin data
         
-    -- return request
-    return wrk.format()
+--         if table.getn(filenames) > 0 then
+--             local filename = filenames[(counter - 1) % (table.getn(filenames)) + 1]
+
+--             -- form files    
+--             for k, v in string.gmatch(filename, "([%w_]+)=([^&]*)") do        
+--                 wrk.body = wrk.body .. get_form_data(k, v, true)
+--             end
+--         end 
+
+--         if table.getn(fieldnames) > 0 then
+--             local fieldname = fieldnames[(counter - 1) % (table.getn(fieldnames)) + 1]
+            
+--             -- form fields
+--             for k, v in string.gmatch(fieldname, "([%w_]+)=([^&]*)") do        
+--                 wrk.body = wrk.body .. get_form_data(k, v, false) 
+--             end
+--         end 
+        
+--         -- last boundary
+--         wrk.body = wrk.body .. LastBoundary
+--     end 
+
+--     -- update counter
+--     counter = counter + 1
+        
+--     -- return request
+--     return wrk.format()
     
-end
+-- end
 
 function response(status, headers, body)
     print(counter, body)    
