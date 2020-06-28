@@ -7,6 +7,7 @@ local puremagic = require('puremagic')
 
 local parser = argparse("script", "Benchmarking tool.")
 parser:option("-m --method", "HTTP method.")
+parser:option("-v --verbose", "Print response."):args("?")
 parser:option("-f --file", "Image file."):count("*")
 parser:option("-d --data", "Form data."):count("*")
 
@@ -28,6 +29,7 @@ local LastBoundary = "--" .. Boundary .. "--"
 local CRLF = "\r\n"
 local filenames
 local fieldnames
+local verbose = false
 local counter = 1
 
 function read_txt_file(path)
@@ -63,7 +65,9 @@ end
 function init(args)     
     local data = parser:parse(args)        
     filenames = data['file']      
-    fieldnames = data['data']      
+    fieldnames = data['data']   
+    print(data['verbose'])
+    verbose = not(data['verbose'] == nil)   
 
     -- auto assign method for HTTP based on formdata
     if not(data['method'] == nil) then 
@@ -81,44 +85,47 @@ function init(args)
 
 end 
 
--- function request()    
 
---     if wrk.method == "POST" then
---         -- assign body 
---         wrk.body = ""
+function request()    
 
---         -- round robin data
+    if wrk.method == "POST" then
+        -- assign body 
+        wrk.body = ""
+
+        -- round robin data
         
---         if table.getn(filenames) > 0 then
---             local filename = filenames[(counter - 1) % (table.getn(filenames)) + 1]
+        if table.getn(filenames) > 0 then
+            local filename = filenames[(counter - 1) % (table.getn(filenames)) + 1]
 
---             -- form files    
---             for k, v in string.gmatch(filename, "([%w_]+)=([^&]*)") do        
---                 wrk.body = wrk.body .. get_form_data(k, v, true)
---             end
---         end 
+            -- form files    
+            for k, v in string.gmatch(filename, "([%w_]+)=([^&]*)") do        
+                wrk.body = wrk.body .. get_form_data(k, v, true)
+            end
+        end 
 
---         if table.getn(fieldnames) > 0 then
---             local fieldname = fieldnames[(counter - 1) % (table.getn(fieldnames)) + 1]
+        if table.getn(fieldnames) > 0 then
+            local fieldname = fieldnames[(counter - 1) % (table.getn(fieldnames)) + 1]
             
---             -- form fields
---             for k, v in string.gmatch(fieldname, "([%w_]+)=([^&]*)") do        
---                 wrk.body = wrk.body .. get_form_data(k, v, false) 
---             end
---         end 
+            -- form fields
+            for k, v in string.gmatch(fieldname, "([%w_]+)=([^&]*)") do        
+                wrk.body = wrk.body .. get_form_data(k, v, false) 
+            end
+        end 
         
---         -- last boundary
---         wrk.body = wrk.body .. LastBoundary
---     end 
+        -- last boundary
+        wrk.body = wrk.body .. LastBoundary
+    end 
 
---     -- update counter
---     counter = counter + 1
+    -- update counter
+    counter = counter + 1
         
---     -- return request
---     return wrk.format()
+    -- return request
+    return wrk.format()
     
--- end
+end
 
 function response(status, headers, body)
-    print(counter, body)    
+    if verbose then 
+        print(counter, body)    
+    end
 end

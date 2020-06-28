@@ -17,7 +17,24 @@ wrk -c 4 -d 1m -t 4 -s post.lua 'https://donut-dot-hottab-net.appspot.com/v3/res
   -H 'origin: https://sopa.asia' \
   -H 'referer: https://sopa.asia/' \
   --latency --timeout 30s -- \
-  -m GET
+  -m GET -v
+
+
+# Usage
+Benchmarking tool.
+
+Options:
+         -m <method>,    HTTP method.
+   --method <method>
+          -v [<verbose>],
+   --verbose [<verbose>]
+                         Print response.
+       -f <file>,        Image file.
+   --file <file>
+       -d <data>,        Form data.
+   --data <data>
+   -h, --help            Show this help message and exit.
+
 
 ```
 
