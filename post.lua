@@ -66,7 +66,7 @@ function init(args)
     local data = parser:parse(args)        
     filenames = data['file']      
     fieldnames = data['data']   
-    print(data['verbose'])
+    -- print(data['verbose'])
     verbose = not(data['verbose'] == nil)   
 
     -- auto assign method for HTTP based on formdata
@@ -75,7 +75,7 @@ function init(args)
     else 
         -- has form data to post
         if (table.getn(filenames) > 0) or (table.getn(fieldnames) > 0) then
-            print('posting')
+            -- print('posting')
             wrk.method = "POST"    
             wrk.headers["Content-Type"] = "multipart/form-data; boundary=" .. Boundary
         else 
