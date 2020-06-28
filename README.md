@@ -2,7 +2,7 @@
 
 ```bash
 
-# start server
+# start demo server
 python demo_server.py
 
 # spam
