@@ -31,4 +31,4 @@ Options:
 
 ```
 
-- run more than 1 thread will use seperate lua context per thread
+- run more than 1 thread will use seperate lua context per thread, run more than 1 -d or -f param will run in round-robin manner.
